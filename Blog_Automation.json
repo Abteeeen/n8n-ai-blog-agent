@@ -1,0 +1,1363 @@
+{
+  "name": "Blog Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "011ed566-ef71-4aa7-809f-a25b4816ec6b",
+              "name": "notionPageId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "88c41384-3fb4-48db-bed0-f669295208e9",
+              "name": "title",
+              "value": "={{ $json.property_post_title }}",
+              "type": "string"
+            },
+            {
+              "id": "dcbf89a2-00de-40c8-99ac-9c5652193d45",
+              "name": "keyword",
+              "value": "={{ $json.property_slug }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        -240
+      ],
+      "id": "a10791f6-c938-4f35-a8ed-8d023afcefe7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "api_key",
+              "value": "d26558aa99b517787da47ba0277e3ac9b2f68489e4807632d1453654457fd909"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -360,
+        0
+      ],
+      "id": "2e5ee11a-0412-41df-8795-dec93283933e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access the actual JSON data inside the item wrapper\nconst item = $input.item.json;\n\n// Now access the serp object inside that JSON data\nconst serp = item.serp || {};\n\nreturn {\n  notionPageId: item.notionPageId,\n  title: item.title,\n  keyword: item.keyword,\n\n  // Safely extract the arrays\n  organic_top5: (serp.organic_results || []).slice(0, 5),\n  questions_top3: (serp.related_questions || []).slice(0, 3),\n\n  total_results: serp.search_information?.total_results ?? null\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        -260
+      ],
+      "id": "c805858f-af6f-4344-a3ff-e1a575458419",
+      "name": "FUNCTION (top5)"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferLast"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -40,
+        -200
+      ],
+      "id": "13a82b04-c66e-418a-b302-2d6df6893df0",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  serp: $json\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "6abc5f40-8e27-4c43-b755-d7efa9a79e75",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.name }}",
+                    "rightValue": "how-to",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "fc7ea339-7f58-4ec0-bea6-078c1ac6ea0b"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "19fc5488-2e32-4045-a3c2-20c9502c3b18",
+                    "leftValue": "={{ $json.name }}",
+                    "rightValue": "comparison",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7b167b5f-c4f7-41b0-8c37-18860ca20769",
+                    "leftValue": "={{ $json.name }}",
+                    "rightValue": "why is",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "99ff22c4-9be1-4094-b28d-39929b2aa6f7",
+                    "leftValue": "={{ $json.name }}",
+                    "rightValue": "listicle",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        -200
+      ],
+      "id": "ac6f10d7-95ca-44bf-8587-4cb2010b5c08",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        260,
+        0
+      ],
+      "id": "d7da0282-1207-404e-8896-0567371d00a8",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "YpMhd3ROFz4wBfJT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Access the incoming item\nconst item = $input.item.json;\n\n// 1. Get the text directly\nconst aiText = item.text || item.output || \"\"; \n\n// 2. SMART EXTRACTION: Find the JSON object inside the text\n// We look for the first \"{\" and the last \"}\" and ignore everything else.\nlet cleanJson = \"{}\";\nconst firstOpen = aiText.indexOf('{');\nconst lastClose = aiText.lastIndexOf('}');\n\nif (firstOpen !== -1 && lastClose !== -1) {\n  cleanJson = aiText.substring(firstOpen, lastClose + 1);\n}\n\n// 3. Parse the text into a real Object\nlet parsedData = {};\ntry {\n  parsedData = JSON.parse(cleanJson);\n} catch (error) {\n  // Fallback if parsing fails\n  parsedData = { article_type: \"general\", intent: \"unknown\", reasoning: \"Parsing error\" };\n}\n\nreturn {\n  // Keep the original data\n  ...item,\n  \n  // Add the new AI analysis fields\n  intent: parsedData.intent,\n  \n  // FORCE LOWERCASE for the Switch node\n  article_type: (parsedData.article_type || \"\").toLowerCase(), \n  \n  reasoning: parsedData.reasoning\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        -200
+      ],
+      "id": "d342064f-8b47-4256-b14e-df48470a0d91",
+      "name": "parsing"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        720
+      ],
+      "id": "fd4e4dd1-b3e8-4379-a10e-a03c6095a2b5",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "YpMhd3ROFz4wBfJT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=*** CONTEXT & DATA (Use this source material) ***\nTarget Keyword: {{ $('FUNCTION (top5)').first().json.keyword }}\nUser's Proposed Title: {{ $('FUNCTION (top5)').first().json.title }}\nDetermined Intent: {{ $json.intent }}\nAnalysis Reasoning: {{ $json.reasoning }}\n\nTop Ranking Competitors (SERP Data):\n{{ $('FUNCTION (top5)').first().json.organic_top5.map(i => \"- \" + i.title).join(\"\\n\") }}\n\n*** YOUR INSTRUCTIONS ***\nYour job is to write a blog post in clear, active voice, using simple English at an 8th-grade reading level. Keep paragraphs short and direct. The writing should be helpful, insightful, and easy for readers to follow.\n\nMake sure you understand the intent of the keyword (provided in the Context above), and begin writing based on the SERP data provided.\n\nFollow this exact structure:\n\n1. Title: \nBegin with “How to...” (Use the User's Proposed Title if it fits this format, otherwise adapt the Keyword).\n\n2. Introduction (make sure the intro has no title like \"introduction\"):\nWrite three short, engaging paragraphs introducing the topic and its importance.\nEnd the final paragraph with the line: “So now let’s get started.”\n\n3. Main Content:\nStart with an H2 and writing the title like \"Steps to...\" and the keyword.\nThen a very simple short intro in two lines, making sure you tell the user that following these steps what the result will be.\nUse H3 headings for each step, formatted as: “Step 1: [Action]”, “Step 2: [Action]”, etc.\nEach step must be detailed, practical, and cover every part of the process without skipping anything and in all paragraphs and no bullet, make sure that all steps are in detail.\n\n4. Conclusion:\nUse a heading formatted as “Wrapping Up: [Main Keyword]”.\nWrite a concise summary that reinforces the main takeaways and ends the post smoothly making sure you're true to the intent and context."
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -800,
+        500
+      ],
+      "id": "35359df9-3ab5-47d8-af26-ba797babcf82",
+      "name": "How-to Blogger"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('FUNCTION (top5)').first().json.notionPageId }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|select",
+              "selectValue": "Completed AI Blog"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1940,
+        -240
+      ],
+      "id": "b3ddea7b-d347-4195-addd-1c4a0e101509",
+      "name": "Status changer",
+      "credentials": {
+        "notionApi": {
+          "id": "tUFegFSwi8pRn2Oz",
+          "name": "Notion Blog Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the text safely\nconst longText = $('Format Google').first().json.text || \"\";\n\n// 2. Split by new lines\nconst lines = longText.split('\\n');\nconst result = [];\n\nfor (const line of lines) {\n  let cleanLine = line.trim();\n  \n  if (cleanLine.length > 0) {\n    let blockType = \"paragraph\";\n    let content = cleanLine;\n\n    // RULE 1: Standard Headings\n    if (/^[\\*]*#\\s/.test(cleanLine) || /^#\\s/.test(cleanLine)) {\n       blockType = \"heading_1\";\n       content = cleanLine.replace(/^[\\*]*#\\s+/, \"\").replace(/[\\*]*$/, \"\"); \n    }\n    else if (/^[\\*]*##\\s?/.test(cleanLine)) {\n       blockType = \"heading_2\";\n       content = cleanLine.replace(/^[\\*]*##\\s*/, \"\").replace(/[\\*]*$/, \"\"); \n    }\n    else if (/^[\\*]*###\\s?/.test(cleanLine)) {\n       blockType = \"heading_3\";\n       content = cleanLine.replace(/^[\\*]*###\\s*/, \"\").replace(/[\\*]*$/, \"\"); \n    }\n\n    // RULE 1.5: \"Step X\" & \"Conclusion\" -> Force as Heading 2\n    else if (/^Step\\s\\d+/i.test(cleanLine)) {\n       blockType = \"heading_2\";\n    }\n    else if (/^(Conclusion|Summary|Final Thoughts):?$/i.test(cleanLine)) {\n       blockType = \"heading_2\";\n    }\n\n    // RULE 2: Bullet Points & Numbers\n    else if (/^\\d+\\.\\s/.test(cleanLine)) {\n       blockType = \"numbered_list_item\";\n       content = cleanLine.replace(/^\\d+\\.\\s/, \"\"); \n    }\n    else if (/^[\\*\\-•]\\s/.test(cleanLine)) {\n      blockType = \"bulleted_list_item\";\n      content = cleanLine.replace(/^[\\*\\-•]\\s+/, \"\"); \n    }\n\n    // RULE 3: Screenshots\n    else if (cleanLine.startsWith(\"[SCREENSHOT\")) {\n      blockType = \"to_do\"; \n      content = cleanLine.replace(\"[SCREENSHOT:\", \"📸 Capture:\").replace(\"]\", \"\");\n    }\n\n    // --- THE FIX: CLEAN UP BOLD STARS ---\n    // If it's a normal paragraph, remove the ** symbols so it looks clean\n    if (blockType === \"paragraph\" || blockType.includes(\"list_item\")) {\n        content = content.replace(/\\*\\*/g, \"\"); // Removes **\n        content = content.replace(/\\*/g, \"\");   // Removes single *\n    }\n\n    // Output\n    result.push({ \n      json: { text_chunk: content, block_type: blockType } \n    });\n  }\n}\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        -200
+      ],
+      "id": "93063b1c-2b22-4213-a9f4-8c85aa4122cc",
+      "name": "Chunker"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Status changer').item.json.id }}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "={{ $json.block_type }}",
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.text_chunk }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2460,
+        -200
+      ],
+      "id": "b710142f-0616-468b-81f2-ad452296c864",
+      "name": "Notion Appender",
+      "credentials": {
+        "notionApi": {
+          "id": "tUFegFSwi8pRn2Oz",
+          "name": "Notion Blog Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        720
+      ],
+      "id": "6c189976-aef9-4ad3-b588-da3918740ae0",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "YpMhd3ROFz4wBfJT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=*** DATA SOURCE (Use this data only) ***\nTarget Keyword: {{ $('FUNCTION (top5)').first().json.keyword }}\nUser's Title: {{ $('FUNCTION (top5)').first().json.title }}\nCompetitor Articles:\n{{ $('FUNCTION (top5)').first().json.organic_top5.map(i => \"- \" + i.title).join(\"\\n\") }}\n\n*** YOUR INSTRUCTIONS (Follow Strictly) ***\nWrite a detailed, SEO-friendly comparison article in simple, clear English. Use concise, active sentences. Avoid opinions, filler words, or vague statements. Base all content only on the provided data. Maintain a neutral, factual tone throughout.\n\nEach section must include at least three compact, detailed paragraphs unless otherwise specified.\n\n**FORMATTING RULES:**\n- Use Markdown for headers.\n- Where the structure below says \"H2\", write \"## [Title]\".\n- Where it says \"H3\", write \"### [Title]\".\n- Do NOT write \"H2:\" or \"H3:\" in the text.\n\n*** EXACT STRUCTURE ***\n\nTitle:\n[Product A] vs. [Product B]: Which Is Better?\n(Include the full product names and keywords for SEO visibility.)\n\n## [Product A] vs [Product B]: Who Are They For?\nWrite two short paragraphs explaining who each platform is best for, based on audience type, goals, and use cases. Keep it factual and focused on roles, industries, or needs served.\n\n## Learning Curve / Ease of Use\n### [Product A] Learning Curve\nDescribe the dashboard layout, setup steps, editor interface, and user experience. Discuss any friction points or onboarding challenges using clear, short paragraphs.\n### [Product B] Learning Curve\nDo the same for Product B: describe the setup process, dashboard design, and learning experience.\nConclude the section with one neutral comparison sentence summarizing similarities or key differences in usability.\n\n## Key Features Comparison\n### [Product A] Features\nList the key features from the data in clear, simple sentences. Each feature or capability should be explained in its own short paragraph.\n### [Product B] Features\nList and explain Product B’s main features in the same structure. Maintain balance and neutrality.\n\n## Pricing\nWrite this section in three concise paragraphs explaining pricing tiers, included features, and value differences. Be specific about what each plan offers and who it suits best.\nIf pricing information is missing, write: “Pricing not listed in the data.”\n\n## Pros and Cons\n### [Product A] Pros and Cons\nList pros and cons in bullet points. Use factual, neutral phrasing. Avoid assumptions.\n### [Product B] Pros and Cons\nSame format—bulleted pros and cons based only on provided information.\n\n## Comparison Table\nCreate a Markdown table comparing the tools:\n| Category | [Product A] | [Product B] | Verdict |\n| :--- | :--- | :--- | :--- |\n| Ease of Use | ... | ... | ... |\n| Features | ... | ... | ... |\n| Performance | ... | ... | ... |\n| Pricing | ... | ... | ... |\n| Best For | ... | ... | ... |\nIf a category doesn’t apply, write “Not applicable.”\n\n## Final Verdict\nWrite two to three short paragraphs summarizing which product fits which type of user and why. Keep tone neutral, no hype, no speculation.\n\n## FAQs\nAnswer questions only using the given data.\nIf any question can’t be answered, write: “Not specified in the data provided.”"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -720,
+        500
+      ],
+      "id": "df6e122c-752e-4f80-8c36-0f50b2bc90e2",
+      "name": "Comparison-Blogger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=*** CONTEXT & DATA (Use this source material) ***\nTarget Keyword: {{ $('FUNCTION (top5)').first().json.keyword }}\nUser's Title: {{ $('FUNCTION (top5)').first().json.title }}\nCompetitor Articles (SERP):\n{{ $('FUNCTION (top5)').first().json.organic_top5.map(i => \"- \" + i.title).join(\"\\n\") }}\n\n*** YOUR INSTRUCTIONS ***\nYour job is to write a blog post in clear, active voice, using simple English at an 8th-grade reading level. Keep paragraphs short and direct. The writing should be helpful, insightful, and easy for readers to follow. \n\nMake sure you understand the intent of the keyword (provided above), and begin writing based on the SERP data.\n\n**CRITICAL FORMATTING RULES:**\n1. **Markdown Only:** - Write \"## Title\" for H2.\n   - Write \"### Title\" for H3.\n2. **No Bullet Points:** Do not use bullet points anywhere. Write everything in full sentences/paragraphs.\n3. **Visuals:** If a specific fix needs visual verification, add a new line saying exactly:\n   [SCREENSHOT: Description of what to capture]\n\n*** ARTICLE STRUCTURE ***\n\nTitle:\nWhy Is {{ $('FUNCTION (top5)').first().json.keyword }}? \n(Adapt the keyword to fit a \"Why is...?\" or \"Why does...?\" question format naturally).\n\nIntroduction:\n(No heading for the intro).\nWrite three short, engaging paragraphs explaining the problem, why it frustrates users, and why understanding the cause matters.\nKeep sentences simple and practical. Help the reader feel understood.\nEnd the final paragraph with the line: “So now let’s get started.”\n\n## What Causes This Issue?\nStart with a short, clear two-sentence intro explaining that the issue usually has a few common causes.\nWrite several short paragraphs describing each cause one by one in simple, direct language.\nExplain what triggers the problem, why it happens, and how it affects users.\n\n## Quick Fixes You Can Try Right Now\nBegin with a two-sentence intro explaining that these steps solve the problem for most users.\n### Fix 1: [Action Name]\n(Write a paragraph describing exactly what the user should do, why it works, and what they should expect.)\n### Fix 2: [Action Name]\n(Write a paragraph describing exactly what the user should do, why it works, and what they should expect.)\n(Continue for as many quick fixes as the SERP data suggests).\n\n## Advanced Fixes for Persistent Issues\nWrite two short lines explaining this section helps users whose problem continues even after basic fixes.\n### Advanced Fix 1: [Action Name]\n(Explain in a detailed paragraph: what the fix is, why it solves deeper causes, how to carry it out step by step, and the result.)\n### Advanced Fix 2: [Action Name]\n(Explain in a detailed paragraph).\n\n## How to Prevent This in the Future\nWrite three short paragraphs giving simple prevention tips.\nFocus on habits, settings, or Notion behaviors that avoid the same issue happening again.\n\n## Example Scenario: How Someone Fixed This Issue\nWrite one short, relatable example as a paragraph.\nShow a typical user with this problem, what they tried, what worked, and how it helped them.\n\n## Wrapping Up: {{ $('FUNCTION (top5)').first().json.keyword }}\nWrite a concise summary that reinforces the main takeaways, explains what the reader now understands, and ends the post smoothly.\nStay true to the intent and context."
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -640,
+        500
+      ],
+      "id": "86e76494-cfdd-42cd-9382-9ac8f5000ed3",
+      "name": "Why is Blogger"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        720
+      ],
+      "id": "a5c5924a-df4b-4d17-a99a-3ba5d402a353",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "YpMhd3ROFz4wBfJT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert SEO Content Strategist. Analyze the alignment between the User's Proposed Title and the actual SERP data.\n\nUser's Proposed Title: {{ $json.title }}\nTarget Keyword: {{ $json.keyword }}\n\nTop 5 Organic Results (Current Competition):\n{{ $json.organic_top5.map(result => \"- \" + result.title).join(\"\\n\") }}\n\nTop 3 Related Questions:\n{{ $json.questions_top3.map(q => \"- \" + q.question).join(\"\\n\") }}\n\n---\nBased on the SERP data and the User's specific title, determine the best content strategy.\n\n1. **User Intent:** (Informational, Transactional, Navigational)\n2. **Article Type:** Strictly choose ONE: \"How-to\", \"Comparison\", \"Listicle\", or \"Why is\"\n- Choose \"Listicle\" if the titles contain numbers (e.g. \"10 Best\", \"Top 5\"), \"Best\", \"Tools\", or \"Examples\".\n   - Choose \"How-to\" if the titles imply a step-by-step process.\n   - Choose \"Comparison\" if it compares two specific items (Vs).\n   - Choose \"Why-is\" if it asks a definition or cause question.\n\n3. **Reasoning:** Explain why this type fits both the keyword and the user's title.\n\nReturn the response in strict JSON format:\n{\n\"intent\": \"...\",\n\"article_type\": \"...\",\n\"reasoning\": \"...\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        340,
+        -200
+      ],
+      "id": "37dc348c-6530-4fe2-8169-71f464156450",
+      "name": "Key Word Analyzer"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyBIJ8Yi83Q6ww-ZvRaeQZTdTU1zXViJwfo"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": `*** DATA SOURCE (Use this source material) ***\nTarget Keyword: ${$('FUNCTION (top5)').first().json.keyword}\nUser's Title: ${$('FUNCTION (top5)').first().json.title}\nCompetitors:\n${$('FUNCTION (top5)').first().json.organic_top5.map(i => \"- \" + i.title).join(\"\\n\")}\n\n*** YOUR INSTRUCTIONS ***\n${$('Get Prompt').first().json.property_prompt}\n`\n        }\n      ]\n    }\n  ],\n  \"tools\": [{ \"google_search\": {} }]\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1420,
+        -460
+      ],
+      "id": "a8ee756f-8b80-453b-a8d8-c542b0051c83",
+      "name": "How to Blogger",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract text from Google's deep JSON structure\nconst googleData = $input.item.json;\nconst text = googleData.candidates?.[0]?.content?.parts?.[0]?.text || \"Error generating content\";\n\nreturn { json: { text: text } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        -200
+      ],
+      "id": "a201eb0e-df89-425b-a1ef-f95883bb08a4",
+      "name": "Format Google"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyAiFeLLjsGVuuyi-fZDzXxj8vFsorBR_so"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": `*** DATA SOURCE (Use this source material) ***\nTarget Keyword: ${$('FUNCTION (top5)').first().json.keyword}\nUser's Title: ${$('FUNCTION (top5)').first().json.title}\nCompetitor Articles:\n${$('FUNCTION (top5)').first().json.organic_top5.map(i => \"- \" + i.title).join(\"\\n\")}\n\n*** YOUR INSTRUCTIONS ***\n${$('Get Prompt').first().json.property_prompt}\n`\n        }\n      ]\n    }\n  ],\n  \"tools\": [{ \"google_search\": {} }]\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1420,
+        -280
+      ],
+      "id": "ed21b440-6aad-45df-a833-35d0e583718b",
+      "name": "Comparison Blogger"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "1c8206a2-d525-80d4-9fbe-ca1458b59212",
+          "mode": "list",
+          "cachedResultName": "Focuzed Blogpost",
+          "cachedResultUrl": "https://www.notion.so/1c8206a2d52580d49fbeca1458b59212"
+        },
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|select",
+              "condition": "equals",
+              "selectValue": "For AI writing"
+            },
+            {
+              "key": "Slug|rich_text",
+              "condition": "is_not_empty"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -1040,
+        -80
+      ],
+      "id": "1d13c133-ebbf-4b1e-a7c9-13e0d91c02f1",
+      "name": "Focuzed Blogger",
+      "credentials": {
+        "notionApi": {
+          "id": "tUFegFSwi8pRn2Oz",
+          "name": "Notion Blog Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyAiFeLLjsGVuuyi-fZDzXxj8vFsorBR_so"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ \n{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": `*** CONTEXT & DATA (Use this source material) ***\nTarget Keyword: ${$('FUNCTION (top5)').first().json.keyword}\nUser's Title: ${$('FUNCTION (top5)').first().json.title}\nCompetitor Articles (SERP):\n${$('FUNCTION (top5)').first().json.organic_top5.map(i => \"- \" + i.title).join(\"\\n\")}\n\n*** YOUR INSTRUCTIONS ***\nYour job is to write a blog post in clear, active voice, using simple English at an 8th-grade reading level. Keep paragraphs short and direct. The writing should be helpful, insightful, and easy for readers to follow. \n\nMake sure you understand the intent of the keyword (provided above), and begin writing based on the SERP data.\n\n**CRITICAL FORMATTING RULES:**\n1. **Markdown Only:** - Write \"## Title\" for H2.\n   - Write \"### Title\" for H3.\n2. **No Bullet Points:** Do not use bullet points anywhere. Write everything in full sentences/paragraphs.\n3. **Visuals:** If a specific fix needs visual verification, add a new line saying exactly:\n   [SCREENSHOT: Description of what to capture]\n\n*** ARTICLE STRUCTURE ***\n\nTitle:\nWhy Is ${$('FUNCTION (top5)').first().json.keyword}? \n(Adapt the keyword to fit a \"Why is...?\" or \"Why does...?\" question format naturally).\n\nIntroduction:\n(No heading for the intro).\nWrite three short, engaging paragraphs explaining the problem, why it frustrates users, and why understanding the cause matters.\nKeep sentences simple and practical. Help the reader feel understood.\nEnd the final paragraph with the line: “So now let’s get started.”\n\n## What Causes This Issue?\nStart with a short, clear two-sentence intro explaining that the issue usually has a few common causes.\nWrite several short paragraphs describing each cause one by one in simple, direct language.\nExplain what triggers the problem, why it happens, and how it affects users.\n\n## Quick Fixes You Can Try Right Now\nBegin with a two-sentence intro explaining that these steps solve the problem for most users.\n### Fix 1: [Action Name]\n(Write a paragraph describing exactly what the user should do, why it works, and what they should expect.)\n### Fix 2: [Action Name]\n(Write a paragraph describing exactly what the user should do, why it works, and what they should expect.)\n(Continue for as many quick fixes as the SERP data suggests).\n\n## Advanced Fixes for Persistent Issues\nWrite two short lines explaining this section helps users whose problem continues even after basic fixes.\n### Advanced Fix 1: [Action Name]\n(Explain in a detailed paragraph: what the fix is, why it solves deeper causes, how to carry it out step by step, and the result.)\n### Advanced Fix 2: [Action Name]\n(Explain in a detailed paragraph).\n\n## How to Prevent This in the Future\nWrite three short paragraphs giving simple prevention tips.\nFocus on habits, settings, or Notion behaviors that avoid the same issue happening again.\n\n## Example Scenario: How Someone Fixed This Issue\nWrite one short, relatable example as a paragraph.\nShow a typical user with this problem, what they tried, what worked, and how it helped them.\n\n## Wrapping Up: ${$('FUNCTION (top5)').first().json.keyword}\nWrite a concise summary that reinforces the main takeaways, explains what the reader now understands, and ends the post smoothly.\nStay true to the intent and context.`\n        }\n      ]\n    }\n  ],\n  \"tools\": [\n    {\n      \"google_search\": {}\n    }\n  ]\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1420,
+        -20
+      ],
+      "id": "82f720be-40ba-4dd7-b1b0-bf76a29729da",
+      "name": "Why is Blogger2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyAiFeLLjsGVuuyi-fZDzXxj8vFsorBR_so"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": `*** MISSION ***\nYou are an intelligent Editorial Strategist. Your goal is to determine the *minimum effective dose* of content to solve the user's problem.\n\n**KEYWORD:** \"${$('FUNCTION (top5)').first().json.keyword}\"\n**INTENT:** ${$('parsing').first().json.article_type}\n\n*** STEP 1: SCOPE ANALYSIS (CRITICAL) ***\nAnalyze the complexity of the task.\n- **Low Complexity:** (e.g., \"connect notion to calendar\", \"change password\"). Needs a **\"Quick Guide\"**: Short intro, direct steps, done. Max 800 words.\n- **High Complexity:** (e.g., \"build a second brain\", \"SEO strategy\"). Needs a **\"Deep Dive\"**: Concepts, examples, detailed walkthrough. 1500+ words.\n\n*** STEP 2: CREATE THE BRIEF ***\nProduce a JSON object based on the Scope you determined above.\n\nIf Scope is **Low Complexity**, the outline MUST be concise (no \"history of\", no long intros).\nIf Scope is **High Complexity**, the outline should be detailed.\n\n*** OUTPUT FORMAT (JSON) ***\n{\n  \"scope\": \"Quick Guide OR Deep Dive\",\n  \"estimated_word_count\": \"e.g., 600 words\",\n  \"tone_instruction\": \"e.g., 'Direct and punchy' OR 'Thorough and explanatory'\",\n  \"detailed_outline\": \"The exact headings to use. (Keep it short for Quick Guides!)\"\n}`\n        }\n      ]\n    }\n  ],\n  \"tools\": [{ \"google_search\": {} }]\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1160,
+        980
+      ],
+      "id": "07343409-1af3-43e7-9e19-3d5fb09be931",
+      "name": "Strategist Node"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "2bd206a2-d525-8024-8a8e-ef962c562d56",
+          "mode": "list",
+          "cachedResultName": "Blogging Prompts",
+          "cachedResultUrl": "https://www.notion.so/2bd206a2d52580248a8eef962c562d56"
+        },
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Intent|title",
+              "condition": "equals",
+              "titleValue": "={{ $json.article_type }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        -240
+      ],
+      "id": "5ba11ff0-361b-4238-a802-502204ecc0d0",
+      "name": "Get Prompt",
+      "credentials": {
+        "notionApi": {
+          "id": "tUFegFSwi8pRn2Oz",
+          "name": "Notion Blog Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyAiFeLLjsGVuuyi-fZDzXxj8vFsorBR_so"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": `*** DATA SOURCE (Use this source material) ***\nTarget Keyword: ${$('FUNCTION (top5)').first().json.keyword}\nUser's Title: ${$('FUNCTION (top5)').first().json.title}\nCompetitor Articles:\n${$('FUNCTION (top5)').first().json.organic_top5.map(i => \"- \" + i.title).join(\"\\n\")}\n\n*** YOUR INSTRUCTIONS ***\n${$('Get Prompt').first().json.property_prompt}\n`\n        }\n      ]\n    }\n  ],\n  \"tools\": [{ \"google_search\": {} }]\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1420,
+        160
+      ],
+      "id": "0ac2466c-51b3-492b-a513-0855e9ad9b00",
+      "name": "Listicle Blogger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2534eb4c-296c-4dd1-ae7c-11b01f064115",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "=For AI Writing",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1300,
+        560
+      ],
+      "id": "7e2ccf8a-b018-46d5-98d2-5cdc62955e5c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "436a8bde-de33-4bc7-9478-cd7e7c7adcc9",
+          "mode": "list",
+          "cachedResultName": "Bullet Posts Database",
+          "cachedResultUrl": "https://www.notion.so/436a8bdede334bc79478cd7e7c7adcc9"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|select",
+              "condition": "equals",
+              "selectValue": "For AI Writing"
+            },
+            {
+              "key": "Slug|rich_text",
+              "condition": "is_not_empty"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -1020,
+        -380
+      ],
+      "id": "3d340e9d-deba-474a-a207-793ddf85595c",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "tUFegFSwi8pRn2Oz",
+          "name": "Notion Blog Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "event": "pagedUpdatedInDatabase",
+        "databaseId": {
+          "__rl": true,
+          "value": "436a8bde-de33-4bc7-9478-cd7e7c7adcc9",
+          "mode": "list",
+          "cachedResultName": "Bullet Posts Database",
+          "cachedResultUrl": "https://www.notion.so/436a8bdede334bc79478cd7e7c7adcc9"
+        }
+      },
+      "type": "n8n-nodes-base.notionTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1020,
+        760
+      ],
+      "id": "b0a59ade-2229-4fa9-9662-1d7683f2c848",
+      "name": "Notion Bullet Trigger",
+      "credentials": {
+        "notionApi": {
+          "id": "tUFegFSwi8pRn2Oz",
+          "name": "Notion Blog Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "event": "pagedUpdatedInDatabase",
+        "databaseId": {
+          "__rl": true,
+          "value": "1c8206a2-d525-80d4-9fbe-ca1458b59212",
+          "mode": "list",
+          "cachedResultName": "Focuzed Blogpost",
+          "cachedResultUrl": "https://www.notion.so/1c8206a2d52580d49fbeca1458b59212"
+        }
+      },
+      "type": "n8n-nodes-base.notionTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1300,
+        740
+      ],
+      "id": "e9fa22fa-e2c7-4708-be61-416ccb24633d",
+      "name": "Notion Focuzed Trigger",
+      "credentials": {
+        "notionApi": {
+          "id": "tUFegFSwi8pRn2Oz",
+          "name": "Notion Blog Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -1020,
+        560
+      ],
+      "id": "207ad42e-6c4f-42b7-bb70-ca14d953c3dd",
+      "name": "On form submission",
+      "webhookId": "0d478433-721a-4c1f-b506-5ece625cb042"
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "message"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C0A4K4UQVDM",
+          "mode": "list",
+          "cachedResultName": "n8n-blogger"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1500,
+        640
+      ],
+      "id": "61789ac4-e4f3-4147-8663-a1831d3fa371",
+      "name": "Slack Trigger",
+      "webhookId": "697dbefa-cb43-4cd8-830f-6a1cb2c92519",
+      "credentials": {
+        "slackApi": {
+          "id": "z9Ztbuw2ErQFyJQ2",
+          "name": "BLOG BOT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -780,
+        -220
+      ],
+      "id": "2cd9ae07-5f80-4990-9c9d-3ba31f3297ac",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "path": "start-blog-writer",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1420,
+        -260
+      ],
+      "id": "e5adf2ab-b28f-4211-b07b-f253502d9704",
+      "name": "Webhook",
+      "webhookId": "efec1aa5-efab-4d8b-be82-ff42cbe078a7"
+    }
+  ],
+  "pinData": {
+    "Slack Trigger": [
+      {
+        "json": {
+          "type": "message",
+          "user": "U09HU6DRAGN",
+          "ts": "1766398400.928109",
+          "client_msg_id": "d1a96cbb-5501-4c25-a47f-af497a68d46c",
+          "text": "start",
+          "team": "T01ETSXAD1N",
+          "blocks": [
+            {
+              "type": "rich_text",
+              "block_id": "RfLpe",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "start"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "channel": "C0A4K4UQVDM",
+          "event_ts": "1766398400.928109",
+          "channel_type": "group"
+        }
+      }
+    ],
+    "Notion Bullet Trigger": [
+      {
+        "json": {
+          "id": "2d1206a2-d525-8066-bb6f-fa85d7b345ac",
+          "Description": "",
+          "Tags": [],
+          "Status": "Completed AI Blog",
+          "Meta Title": "",
+          "Author": [],
+          "Meta Keywords": "",
+          "Text": "",
+          "Content Cluster": [],
+          "Meta Description": "",
+          "Featured": false,
+          "Date": null,
+          "AI suggestions": "",
+          "Database": "",
+          "Publish": false,
+          "Slug": "how-to-undo-in-notion",
+          "Post Title": "How to Undo in Notion: Complete Guide Across all Devices (TEST)"
+        }
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.codevantage.io",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "accept-encoding": "gzip, br",
+            "accept-language": "en-US,en;q=0.7",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "103.99.148.171",
+            "cf-ipcountry": "IN",
+            "cf-ray": "9b1f4aaff909fdee-SIN",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cookie": "rl_page_init_referrer=RudderEncrypt%3AU2FsdGVkX19q7jpLxX%2BBIrfGBzIsdg3b6VKJCjPa8xs%3D; rl_page_init_referring_domain=RudderEncrypt%3AU2FsdGVkX19vVi85lpsYM5sgF6bpuOYysWInS%2BcczQo%3D; n8n-auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5ZGY3MWQ4LTI2YzktNGFjYy1iMzNkLWVhNTBjMTMwN2NkYiIsImhhc2giOiJDSlFTa0JUZ1lJIiwiYnJvd3NlcklkIjoiTjV6SmxGczIxUmlqMzgyZFh6U2F4K2ZmS05acTkyYUdrbk0zZUpWTGZnQT0iLCJpYXQiOjE3NjYzODU0MzQsImV4cCI6MTc2Njk5MDIzNH0.QkT2SvY2R3JDARH4QXYRYK3MojsfLbZFbV5ZOdubGkY; rl_anonymous_id=RudderEncrypt%3AU2FsdGVkX1%2Bv0fkskuu%2F0a37wuplC6tEOhKHEl0ZfdrWMXKv%2F2MUHCOhALo350sfnxVIRvxtMMVu%2BUjImHpzTw%3D%3D; rl_user_id=RudderEncrypt%3AU2FsdGVkX1%2B%2BugF9wmDbw57%2F3cqj4CJsW1e83utOUeBXRQZpyHNSB8rM3%2BdmqNz4egnNJ%2BAdUIZRMlsGIh1qgjFT3UZvUn0NSy9MHJI0nb9SZ1mxT1CIFPdcRoIcKu2NaHgINi1dtcCEnO2G1h87bbc0%2FtGcSp6DEaADOkDEXAQ%3D; rl_trait=RudderEncrypt%3AU2FsdGVkX19hhok1sWBn3F7NkoZJM4JQC%2BgdYo5s2gXS9Mwk6xeoUQuZQgrPv2m2f1eVEZpzcflXTDN953Z8iVBLrQ76phsd8vJXPp8qWPamUBB75thOmKMoWPkdajFovtBKvE1KV9%2Bnxuu98BfsUw%3D%3D; ph_phc_4URIAm1uYfJO7j8kWSe0J8lc8IqnstRLS7Jx8NcakHo_posthog=%7B%22distinct_id%22%3A%2274525d77094878c8cbd9cb45a42b56910d34ea5065046e05f07447a7ea8ef173%2319df71d8-26c9-4acc-b33d-ea50c1307cdb%22%2C%22%24sesid%22%3A%5B1766403011008%2C%22019b45b3-7962-73a1-809b-1658f2fd4c03%22%2C1766400948577%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22%24direct%22%2C%22u%22%3A%22https%3A%2F%2Fn8n.codevantage.io%2Fsignin%22%7D%7D; rl_session=RudderEncrypt%3AU2FsdGVkX1%2FLMfCAVdQekTCpPJlMj4NUqqxcg4VJMHPe1RS0qoXrwLsTTRCaXqzzweF91RiRQKrjVctG3BEyk52EGlNcg0Btn7fr6CuLZmpdqf%2BHU%2B%2FWmn9l5QwgaD2l0MVKlTsP2SRBopbS56EGMw%3D%3D",
+            "if-none-match": "W/\"22-6OS7cK0FzqnV2NeDHdOSGS1bVUs\"",
+            "priority": "u=0, i",
+            "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "sec-fetch-user": "?1",
+            "sec-gpc": "1",
+            "upgrade-insecure-requests": "1",
+            "x-forwarded-for": "162.158.88.81",
+            "x-forwarded-host": "n8n.codevantage.io",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "0db127edc961",
+            "x-real-ip": "162.158.88.81"
+          },
+          "params": {},
+          "query": {},
+          "body": {},
+          "webhookUrl": "https://n8n.codevantage.io/webhook/start-blog-writer",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FUNCTION (top5)": {
+      "main": [
+        [
+          {
+            "node": "Key Word Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "FUNCTION (top5)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Key Word Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parsing": {
+      "main": [
+        [
+          {
+            "node": "Get Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "How to Blogger",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Comparison Blogger",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Why is Blogger2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Listicle Blogger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "How-to Blogger",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "How-to Blogger": {
+      "main": [
+        []
+      ]
+    },
+    "Status changer": {
+      "main": [
+        [
+          {
+            "node": "Chunker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunker": {
+      "main": [
+        [
+          {
+            "node": "Notion Appender",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Comparison-Blogger",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comparison-Blogger": {
+      "main": [
+        []
+      ]
+    },
+    "Why is Blogger": {
+      "main": [
+        []
+      ]
+    },
+    "Groq Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Why is Blogger",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Key Word Analyzer": {
+      "main": [
+        [
+          {
+            "node": "parsing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "How to Blogger": {
+      "main": [
+        [
+          {
+            "node": "Format Google",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Google": {
+      "main": [
+        [
+          {
+            "node": "Status changer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comparison Blogger": {
+      "main": [
+        [
+          {
+            "node": "Format Google",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Focuzed Blogger": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Why is Blogger2": {
+      "main": [
+        [
+          {
+            "node": "Format Google",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Strategist Node": {
+      "main": [
+        []
+      ]
+    },
+    "Get Prompt": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listicle Blogger": {
+      "main": [
+        [
+          {
+            "node": "Format Google",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        []
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion Bullet Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Notion Focuzed Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Slack Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion Appender": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Focuzed Blogger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "26872d84-f4c7-4316-84ba-2161473a8725",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "74525d77094878c8cbd9cb45a42b56910d34ea5065046e05f07447a7ea8ef173"
+  },
+  "id": "eVV8WMGEtS86zn1g",
+  "tags": []
+}
