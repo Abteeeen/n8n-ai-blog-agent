@@ -30,12 +30,12 @@ An advanced **n8n automation workflow** that acts as a full-stack content team. 
 
 ```mermaid
 graph TD
-    A[Start: Webhook / Slack / Notion] --> B[Fetch Keywords from Notion DB]
-    B --> C[🕵️ Google Search (SerpApi)]
-    C --> D{🧠 Llama 3.1: Analyze Intent}
-    D -- "How-to" --> E[Gemini: How-to Writer]
-    D -- "Comparison" --> F[Gemini: Comparison Writer]
-    D -- "Listicle" --> G[Gemini: Listicle Writer]
-    D -- "Why-is" --> H[Gemini: Explainer Writer]
-    E & F & G & H --> I[📜 Markdown Formatting]
-    I --> J[🚀 Publish to Notion Page]
+    A["Start: Webhook / Slack / Notion"] --> B["Fetch Keywords from Notion DB"]
+    B --> C["🕵️ Google Search (SerpApi)"]
+    C --> D{"🧠 Llama 3.1: Analyze Intent"}
+    D -- "How-to" --> E["Gemini: How-to Writer"]
+    D -- "Comparison" --> F["Gemini: Comparison Writer"]
+    D -- "Listicle" --> G["Gemini: Listicle Writer"]
+    D -- "Why-is" --> H["Gemini: Explainer Writer"]
+    E & F & G & H --> I["📜 Markdown Formatting"]
+    I --> J["🚀 Publish to Notion Page"]
