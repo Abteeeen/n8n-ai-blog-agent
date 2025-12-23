@@ -24,7 +24,7 @@ An advanced **n8n automation workflow** that acts as a full-stack content team. 
 * **🧠 Intent Classification:** Uses **Llama 3.1 (via Groq)** to analyze search results and decide the best article structure (e.g., *Is this a "How-to" guide or a "Best of" list?*).
 * **📝 Adaptive Drafting:** dynamically fetches specific prompts from Notion based on the article type (e.g., specialized prompts for "Comparison" articles).
 * **🎨 Notion Formatting:** A custom JavaScript "Chunker" converts Markdown output into native **Notion Blocks** (Headings, Bullet points, Paragraphs) for a perfect publishing experience.
-* **🤖 Multi-LLM Agent:** Orchestrates multiple AI models (Llama for logic/routing, Gemini for creative writing) for optimal cost and performance.
+* **🤖 Multi-LLM Agent:** Orchestrates multiple AI models (Llama for logic/routing, Gemini for creative writing) for optimal cost and performances.
 
 ## 🛠️ Architecture
 
