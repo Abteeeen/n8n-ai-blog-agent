@@ -26,7 +26,7 @@ An advanced **n8n automation workflow** that acts as a full-stack content team. 
 * **🎨 Notion Formatting:** A custom JavaScript "Chunker" converts Markdown output into native **Notion Blocks** (Headings, Bullet points, Paragraphs) for a perfect publishing experience.
 * **🤖 Multi-LLM Agent:** Orchestrates multiple AI models (Llama for logic/routing, Gemini for creative writing) for optimal cost and performance.
 
-## 🛠️ Architecture
+## 🛠️ Architectures
 
 ```mermaid
 graph TD
