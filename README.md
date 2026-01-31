@@ -16,9 +16,9 @@
 
 # ✍️ Autonomous SEO Blog Writer
 
-An advanced **n8n automation workflow** that acts as a full-stack content team. It researches keywords on Google, determines user intent (How-to vs. Comparison vs. Listicle) using **Llama 3.1**, and drafts high-quality, SEO-optimized articles using **Google Gemini 2.5 Flash** directly into **Notion**.
+An advanced **n8n automation workflow** that acts as a full-stack content developing team. It researches keywords on Google, determines user intent (How-to vs. Comparison vs. Listicle) using **Llama 3.1**, and drafts high-quality, SEO-optimized articles using **Google Gemini 2.5 Flash** directly into **Notion**.
 
-## 🚀 Key Features
+## 🚀 Key Feature
 
 * **🔍 Smart Research:** Uses **SerpApi** to scrape the Top 5 organic Google results for any given keyword.
 * **🧠 Intent Classification:** Uses **Llama 3.1 (via Groq)** to analyze search results and decide the best article structure (e.g., *Is this a "How-to" guide or a "Best of" list?*).
@@ -26,7 +26,7 @@ An advanced **n8n automation workflow** that acts as a full-stack content team. 
 * **🎨 Notion Formatting:** A custom JavaScript "Chunker" converts Markdown output into native **Notion Blocks** (Headings, Bullet points, Paragraphs) for a perfect publishing experience.
 * **🤖 Multi-LLM Agent:** Orchestrates multiple AI models (Llama for logic/routing, Gemini for creative writing) for optimal cost and performance.
 
-## 🛠️ Architectures
+## 🛠️ Architecture
 
 ```mermaid
 graph TD
