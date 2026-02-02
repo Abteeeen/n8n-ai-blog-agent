@@ -18,7 +18,7 @@
 
 An advanced **n8n automation workflow** that acts as a full-stack content developing team. It researches keywords on Google, determines user intent (How-to vs. Comparison vs. Listicle) using **Llama 3.1**, and drafts high-quality, SEO-optimized articles using **Google Gemini 2.5 Flash** directly into **Notion**.
 
-## 🚀 Key Feature
+## 🚀 Key Features
 
 * **🔍 Smart Research:** Uses **SerpApi** to scrape the Top 5 organic Google results for any given keyword.
 * **🧠 Intent Classification:** Uses **Llama 3.1 (via Groq)** to analyze search results and decide the best article structure (e.g., *Is this a "How-to" guide or a "Best of" list?*).
